@@ -15,6 +15,12 @@ $app->using('middleware')->define('test', function($x) use ($app) {
 });
 
 $app->using('middleware')->call('test', 'Fred');
+
+// set up a loader for Mustache
+$app->load('Mustache', 'External/Mustache/src/Mustache');
+$m = new Mustache_Engine;
+echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
+
 //$app->util('macro')->define('test', function($x) use ($app) {
 //    echo 'You are ' . $x . ' calling from IP ' . $app->env('ip');
 //});
