@@ -1,0 +1,64 @@
+# set default to UTF-8
+AddDefaultCharset utf-8
+
+# configures Entity tags
+FileETag none
+
+# prevent Directory Listing
+Options -Indexes
+
+# allows for custom error pages
+ErrorDocument 400 /Bad-Request
+ErrorDocument 401 /Unauthorized
+ErrorDocument 403 /Forbidden
+ErrorDocument 404 /Not-Found
+ErrorDocument 500 /Server-Error
+
+# should block anyone from directly browsing these file extensions
+<FilesMatch "\.(htaccess|htpasswd|ini|log|inc|txt)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+#<FilesMatch "shunt">
+#AddHandler application/x-httpd-php5 .php
+#</FilesMatch>
+
+# Environmental Variables
+# SetEnv varname "variable value"
+SetEnv Rory "Test"
+
+# default expires header in far future
+# changes should be part of the build process, change the file name to change the cache
+#ExpiresDefault "access plus 10 years"
+
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks -MultiViews
+    RewriteEngine On
+    # uncomment if necessary
+    #RewriteBase /path/to/app
+    # check for www
+#    RewriteCond %{HTTPS} off
+#    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+#    RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+#    RewriteCond %{HTTPS} on
+#    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+#    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # check for non-www (if using cookieless domains)
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+
+    RewriteCond %{HTTPS} on
+    RewriteCond %{HTTP_HOST} !^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+    # Create our own content type server variable should it not exist
+    #RewriteRule ^ index.php [QSA,L]
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
