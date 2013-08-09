@@ -18,6 +18,7 @@ $app->using('middleware')->test('Barney');
 
 $test = array('name' => 'test');
 $app->load('Spyc', 'External/Spyc/Spyc.php');
+$app->load('RedBean', 'External/RedBeanPHP/rb.php');
 
 $app->using('middleware')->define('writeYaml', function($input) use ($app) {
     $app->using('debug')->pre(Spyc::YAMLDump($input));
