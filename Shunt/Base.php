@@ -16,18 +16,6 @@ namespace Shunt {
             $this->env = \Shunt\Env::getInstance();
         }
 
-//        public function __isset($name) {
-//            return isset($this->registry->$name);
-//        }
-//
-//        public function __get($name) {
-//            return $this->registry->get($name);
-//        }
-//
-//        public function __set($name, $value) {
-//            return $this->registry->set($name, $value);
-//        }
-
         /**
          * There is no set method for env variables, only a getter
          * @param type $method
@@ -38,7 +26,7 @@ namespace Shunt {
             if (strtolower(substr($method, 0, 3)) == 'get') {
                 $var = lcfirst(substr($method, 3));
                 return $this->env->getEnviromentalVariable($var);
-            } else if(strtolower(substr($method, 0, 3)) == 'set') {
+            } else if (strtolower(substr($method, 0, 3)) == 'set') {
                 $var = lcfirst(substr($method, 3));
                 return $this->env->setEnviromentalVariable($var, $params[0]);
             }
@@ -90,7 +78,7 @@ namespace Shunt {
                     break;
             }
         }
-        
+
         /**
          * 
          * @param type $remove
@@ -105,7 +93,7 @@ namespace Shunt {
             // eg. $this->util('debug') refers to Shunt\Utils\Debug
             return $this->registry->getUtil(ucfirst($util));
         }
-        
+
         /** Determines whether a key exists in the querystring, and its value
          * 
          * @param type $key
@@ -164,10 +152,10 @@ namespace Shunt {
                         $ret = $route->test($expr, $lookup);
                         if ($ret) {
                             //echo '<pre>' . print_r($ret, 1) . '</pre>';
-                            
                             // merge any params with defaults
-                            $params = array_merge($ret->route->paramDefaults, $ret->params);
+                            $params = array_merge($ret->route->defaultArgs, $ret->args);
                             //echo '<pre>' . print_r($params, 1) . '</pre>';
+                            $lookup->args = $params;
                             return $lookup;
                         }
                     }
@@ -178,20 +166,20 @@ namespace Shunt {
                 return $e;
             }
         }
-        
+
         // allows us to build a url
         public function buildUrl($name, $params = array()) {
-            if(isset($this->routes[$name])) {
+            if (isset($this->routes[$name])) {
                 // we want the expression
                 $expr = str_replace(array('(', ')', '*'), null, $this->routes[$name]->expr[0]);
                 $extra = false;
-                
+
                 // merge in our defaults
-                $params = array_merge($this->routes[$name]->paramDefaults, $params);
-                foreach($params as $k => $v) {
+                $params = array_merge($this->routes[$name]->defaultArgs, $params);
+                foreach ($params as $k => $v) {
                     $var = '$' . $k;
-                    if(stripos($expr, $var) !== false) {
-                        if(is_array($v)) {
+                    if (stripos($expr, $var) !== false) {
+                        if (is_array($v)) {
                             $v = implode('/', $v);
                         }
                         $expr = str_replace($var, $v, $expr);
@@ -201,18 +189,17 @@ namespace Shunt {
                     }
                 }
                 // if there are any params left over, add them as part of the querystring
-                if($extra) {
+                if ($extra) {
                     $expr .= '?' . implode('&', $extra);
                 }
                 $this->using('debug')->pre($expr);
                 // check whether some of the params have not been replaced
-                if(stripos($expr, '$') === false) {
+                if (stripos($expr, '$') === false) {
                     return $expr;
                 }
             }
             return false;
         }
-
     }
 
 }

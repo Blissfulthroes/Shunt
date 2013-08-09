@@ -14,7 +14,7 @@ namespace Shunt {
          * Any defined params parsed from the request uri via the router
          * @var type 
          */
-        public $params = null;
+        public $args = null;
 
         /**
          * Points to the route that was matched by the router

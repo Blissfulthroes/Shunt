@@ -12,9 +12,7 @@ namespace Shunt\Util {
             $this->definitions[$name] = $callback;
         }
         
-        public function call() {
-            $args = func_get_args();
-            $name = array_shift($args);
+        public function __call($name, $args) {
             if(isset($this->definitions[$name]) && is_callable($this->definitions[$name])) {
                 return call_user_func_array($this->definitions[$name], $args);
             }

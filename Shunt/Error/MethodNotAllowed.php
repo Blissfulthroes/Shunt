@@ -6,26 +6,26 @@ namespace Shunt\Error {
 
         public $status_code = 405;
         public $title = 'Method Not Allowed';
-        public $default_message = 'Method Not Allowed.';
+        public $defaultMessage = 'The resource you are trying to access is restricted to certain methods and requests.';
         
         public function __construct($message = null, \Shunt\Request $request = null, $code = 0, \Shunt\Exception $previous = null) {
             $this->request = $request;
             if (is_null($message)) {
+                $this->message = $this->defaultMessage;
                 // get allowed methods
                 $allowedMethods = $this->request->route->allowedMethods;
-                $allow = 'The resource you are trying to access only accepts the following methods: </p><ul>';
+                $allow = array();
+                $allow['methodText'] = 'The resource you are trying to access only accepts the following methods:';
                 foreach ($allowedMethods as $allowed) {
-                    $allow .= '<li>' . strtoupper($allowed) . '</li>';
+                    $allow['methods'][] = strtoupper($allowed);
                 }
-                $allow .= '</ul>';
                 // get allowed methods
                 $allowedMethods = $this->request->route->allowedModes;
-                $allow .= '<p>In addition, the resource is restricted to the following requests:</p><ul>';
+                $allow['modesText'] = 'In addition, the resource is restricted to the following requests:';
                 foreach ($allowedMethods as $allowed) {
-                    $allow .= '<li>' . strtoupper($allowed) . '</li>';
+                    $allow['modes'][] = strtoupper($allowed);
                 }
-                $allow .= '</ul><p>';
-                $this->message = $allow;
+                $this->messageData = $allow;
             }
             parent::__construct($this->message, $request, $code, $previous);
         }

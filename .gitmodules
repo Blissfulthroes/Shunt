@@ -4,3 +4,6 @@
 [submodule "External/RedBean"]
 	path = External/RedBean
 	url = https://github.com/gabordemooij/redbean.git
+[submodule "External/Spyc"]
+	path = External/Spyc
+	url = https://github.com/mustangostang/spyc.git

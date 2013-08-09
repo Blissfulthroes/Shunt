@@ -34,7 +34,7 @@ namespace Shunt {
         public $extraParams = null; // extra params specified by the greedy token
         public $validate = null; // validation rules in the form of regex snippets for params in a route
         public $required_params = null; // parameters required by the callback
-        public $paramDefaults = array(); // default values for optional params
+        public $defaultArgs = array(); // default values for optional params
         public $callback = null;
 
         public function __construct($name) {
@@ -77,7 +77,7 @@ namespace Shunt {
                             return '(?P<' . $match[1] . '>.+)';
                         }
                         return '(?P<' . $match[1] . '>[^/]+)';
-                    }, str_replace(array('*', ')'), array('+', ')?'), (string) $route));
+                    }, str_replace(array('*', ')', '.'), array('+', ')?', '\\.'), (string) $route));
             if (substr($route, -1) === '/') {
                 $regex .= '?';
             }
@@ -91,7 +91,7 @@ namespace Shunt {
          * @param type $default_params
          */
         public function defaults($default_params = array()) {
-            $this->paramDefaults = array_merge($this->paramDefaults, $default_params);
+            $this->defaultArgs = array_merge($this->defaultArgs, $default_params);
             return $this;
         }
         
@@ -101,7 +101,7 @@ namespace Shunt {
             if (!preg_match('`^' . $this->regex[0] . '$`i', $route, $match)) {
                 return null;
             }
-            $this->using('debug')->pre($lookup);
+            //$this->using('debug')->pre($lookup);
             foreach ($this->params as $name) {
                 if (isset($match[$name])) {
                     if (isset($this->extraParams[$name])) {
@@ -113,10 +113,10 @@ namespace Shunt {
             }
 
             $lookup->url = $route;
-            $lookup->params = $params;
+            $lookup->args = $params;
             $lookup->route = $this;
             
-            $this->using('debug')->pre($lookup);
+            //$this->using('debug')->pre($lookup);
 
             // check whether the allowed methods are acceptable
             if (in_array($this->getMethod(), $this->allowedMethods) &&

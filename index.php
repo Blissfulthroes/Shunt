@@ -14,12 +14,22 @@ $app->using('middleware')->define('test', function($x) use ($app) {
     echo 'You are ' . $x . ' calling from IP ' . $app->getIp();
 });
 
-$app->using('middleware')->call('test', 'Fred');
+$app->using('middleware')->test('Barney');
+
+$test = array('name' => 'test');
+$app->load('Spyc', 'External/Spyc/Spyc.php');
+
+$app->using('middleware')->define('writeYaml', function($input) use ($app) {
+    $app->using('debug')->pre(Spyc::YAMLDump($input));
+});
+$app->using('middleware')->writeYaml($test);
 
 // set up a loader for Mustache
 $app->load('Mustache', 'External/Mustache/src/Mustache');
 $m = new Mustache_Engine;
 echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
+
+
 
 //$app->util('macro')->define('test', function($x) use ($app) {
 //    echo 'You are ' . $x . ' calling from IP ' . $app->env('ip');
@@ -29,12 +39,15 @@ echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
 echo '<hr/>';
 $app->route('test')
         ->url('/test/$arg(/$wtf*)')
-        ->defaults(array('wtf' => 'mine'));
-//        ->skip();
-//        ->methods('post');
+        ->defaults(array('wtf' => 'mine'))
+        //->skip();
+        ->methods('post');
 
 $app->route('css')
         ->url('/$file*.css');
+
+$app->run();
+exit;
 
 echo '<hr/>';
 echo 'Domain: ' . $app->getDomain() . '<br/>';
@@ -78,6 +91,8 @@ $app->using('db')->call('hello');
 
 echo '<hr/>';
 $app->using('debug')->pre($app->find($app->getUrl()));
+
+
 
 if($app->getUrl() == '/test-redirect') {
     //$app->redirect('/redirected');

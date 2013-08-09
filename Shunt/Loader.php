@@ -20,7 +20,9 @@ namespace Shunt {
             $namespace = rtrim($namespace, '\\');
             $this->namespace = $namespace;
             $this->path = $path;
-            spl_autoload_register(array($this, 'register'));
+            if(!$this->isFile($path)) {
+                spl_autoload_register(array($this, 'register'));
+            }
         }
 
         public function unregister() {
@@ -47,6 +49,25 @@ namespace Shunt {
                 return true;
             }
             unset($classname, $path, $location);
+            return false;
+        }
+        
+        private function isFile($path) {
+            // if path is a direct path to a file (ie, has a .php extension), include it straight away
+            $file_ext = strtolower(strrchr($path, '.'));
+            if (!$file_ext || $file_ext != '.php') {
+                return false;
+            }
+            $path = (substr($path, 0, strlen(SHUNT_DOCROOT)) == SHUNT_DOCROOT) ? $path : SHUNT_DOCROOT . SHUNT_DS . $path;
+            // do a replace on these if they're in the path - also reduce the number of DS to 1 between folders
+            $path = preg_replace('{\\' . SHUNT_DS . '+}', SHUNT_DS, str_replace(array("/", "\\"), SHUNT_DS, $path));
+
+            if (is_file($path)) {
+                $this->last_loaded = $path;
+                include($path);
+                unset($path);
+                return true;
+            }
             return false;
         }
 
